@@ -9,8 +9,8 @@ import {
 } from 'fastify-type-provider-zod'
 import { env } from './config/env.ts'
 import { loginRoute } from './routes/auth/login.ts'
-import { registerRoute } from './routes/auth/register.ts'
 import { meRoute } from './routes/auth/me.ts'
+import { registerRoute } from './routes/auth/register.ts'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 app.setSerializerCompiler(serializerCompiler)

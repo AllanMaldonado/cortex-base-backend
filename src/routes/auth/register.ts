@@ -13,7 +13,9 @@ export const registerRoute: FastifyPluginCallbackZod = (app) => {
         body: z.object({
           name: z.string(),
           email: z.email('E-mail inválido'),
-          password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
+          password: z
+            .string()
+            .min(6, 'A senha deve ter no mínimo 6 caracteres'),
         }),
       },
     },
