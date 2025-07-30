@@ -1,0 +1,9 @@
+services:
+  cortex-base-pg:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: docker
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: cortex-base
+    ports:
+      - "5432:5432"

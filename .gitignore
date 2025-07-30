@@ -1,0 +1,14 @@
+#.gitignore |-----------------------------|
+
+# Node.js 
+**/node_modules/
+
+# Ambientes
+**/.env
+**/.env.*
+
+# Docker
+**/.docker/
+
+# editor
+**/.vscode/
