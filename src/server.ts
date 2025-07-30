@@ -7,6 +7,7 @@ import {
   type ZodTypeProvider,
 } from 'fastify-type-provider-zod'
 import { env } from './config/env.ts'
+import { createUserRoute } from './routes/create-user.ts'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 app.setSerializerCompiler(serializerCompiler)
@@ -18,6 +19,7 @@ app.register(fastifyMultipart)
 
 //rotas
 app.get('/health', () => 'OK')
+app.register(createUserRoute, { prefix: '/api/v1' })
 
 //run
 app.listen({ port: env.PORT })

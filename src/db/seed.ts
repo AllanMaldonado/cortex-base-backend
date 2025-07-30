@@ -11,9 +11,9 @@ await seed(db, schema).refine((f) => {
       columns: {
         name: f.fullName(),
         email: f.email(),
-        password: f.string()
+        password: f.string(),
       },
-    }, 
+    },
   }
 })
 
