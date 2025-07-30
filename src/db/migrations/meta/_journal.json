@@ -8,6 +8,13 @@
       "when": 1753839402494,
       "tag": "0000_large_bloodaxe",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1753884001581,
+      "tag": "0001_lovely_songbird",
+      "breakpoints": true
     }
   ]
 }
