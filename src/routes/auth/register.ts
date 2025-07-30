@@ -1,32 +1,32 @@
 import { eq } from 'drizzle-orm'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import z from 'zod/v4'
-import { db } from '../db/connection.ts'
-import { schema } from '../db/index.ts'
-import { hashPassword } from '../utils/hash.ts'
+import { db } from '../../db/connection.ts'
+import { schema } from '../../db/index.ts'
+import { hashPassword } from '../../utils/hash.ts'
 
-export const createUserRoute: FastifyPluginCallbackZod = (app) => {
+export const registerRoute: FastifyPluginCallbackZod = (app) => {
   app.post(
-    '/user',
+    '/auth/register',
     {
       schema: {
         body: z.object({
           name: z.string(),
-          email: z.email(),
-          password: z.string().min(6),
+          email: z.email('E-mail inválido'),
+          password: z.string().min(6, 'A senha deve ter no mínimo 6 caracteres'),
         }),
       },
     },
     async (req, res) => {
       const { name, email, password } = req.body
 
-      const userExists = await db
+      const [existingUser] = await db
         .select({ email: schema.users.email })
         .from(schema.users)
         .where(eq(schema.users.email, email))
 
-      if (userExists.length > 0) {
-        throw new Error('User already exists')
+      if (existingUser) {
+        return res.status(409).send({ message: 'User already exists' })
       }
 
       const hashedPassword = await hashPassword(password)
@@ -43,7 +43,7 @@ export const createUserRoute: FastifyPluginCallbackZod = (app) => {
       const insertedUser = result[0]
 
       if (!insertedUser) {
-        throw new Error('User already exists')
+        return res.status(500).send({ message: 'error creating user' })
       }
 
       return res.status(201).send({ userId: insertedUser.id })
