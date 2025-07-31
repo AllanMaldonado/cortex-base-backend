@@ -1,5 +1,9 @@
-import { user } from './schema/user.ts'
+import { folders } from './schema/folders.ts'
+import { notes } from './schema/notes.ts'
+import { users } from './schema/users.ts'
 
 export const schema = {
-  users: user,
+  users,
+  folders,
+  notes,
 }
