@@ -17,20 +17,23 @@ const app = fastify().withTypeProvider<ZodTypeProvider>()
 app.setSerializerCompiler(serializerCompiler)
 app.setValidatorCompiler(validatorCompiler)
 
-//plugins (falta: fastifyJwt & fastifySwagger)
+//plugins (fastifySwagger)
 app.register(fastifyCors, { origin: 'http://localhost:5173' })
 app.register(fastifyMultipart, {
   limits: {
     fileSize: 500 * 1024 * 1024, // 500MB for video files
     files: 1,
     fieldNameSize: 100,
-    fieldSize: 1024 * 1024, // 1MB
+    fieldSize: 1024 * 1024,
     fields: 10,
-    headerPairs: 2000
-  }
+    headerPairs: 2000,
+  },
 })
 app.register(fastifyJwt, {
   secret: env.SECRET_KEY,
+  sign: {
+    expiresIn: '7d',
+  },
 })
 
 //rotas

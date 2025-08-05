@@ -2,55 +2,52 @@ import { GoogleGenAI } from '@google/genai'
 import { env } from '../config/env.ts'
 
 const gemini = new GoogleGenAI({
-    apiKey: env.GEMINI_API_KEY,
+  apiKey: env.GEMINI_API_KEY,
 })
 
 const model = 'gemini-2.5-flash'
 
-export async function transcribeAudio(
-    audioBuffer: Buffer,
-    mimeType: string
-) {
+export async function transcribeAudio(audioBuffer: Buffer, mimeType: string) {
+  const prompt =
+    'Transcreva o áudio para português do Brasil. Seja preciso e natural na transcrição. Mantenha a pontuação adequada e divida o texto em parágrafos quando for apropriado.'.trim()
 
-    const prompt = 'Transcreva o áudio para português do Brasil. Seja preciso e natural na transcrição. Mantenha a pontuação adequada e divida o texto em parágrafos quando for apropriado.'.trim()
+  const audioBlob = new Blob([audioBuffer], { type: mimeType })
 
-    const audioBlob = new Blob([audioBuffer], { type: mimeType })
+  const uploadAudio = await gemini.files.upload({
+    file: audioBlob,
+    config: {
+      mimeType,
+    },
+  })
 
-    const uploadAudio = await gemini.files.upload({
-        file: audioBlob,
-        config: {
-            mimeType, 
+  if (!uploadAudio.name) {
+    throw new Error('Failed to get file name from upload result')
+  }
+
+  const response = await gemini.models.generateContent({
+    model,
+    contents: [
+      {
+        text: prompt,
+      },
+      {
+        fileData: {
+          mimeType: uploadAudio.mimeType,
+          fileUri: uploadAudio.uri,
         },
-    })
- 
-    if (!uploadAudio.name) {
-        throw new Error('Failed to get file name from upload result')
-    }
+      },
+    ],
+  })
 
-    const response = await gemini.models.generateContent({
-        model,
-        contents: [
-            {
-                text: prompt,
-            },
-            {
-                fileData: {
-                    mimeType: uploadAudio.mimeType,
-                    fileUri: uploadAudio.uri,
-                },
-            },
-        ],
-    })
+  if (!response.text) {
+    throw new Error('Empty response from Gemini API')
+  }
 
-    if (!response.text) {
-        throw new Error('Empty response from Gemini API')
-    }
-
-    return response.text
+  return response.text
 }
 
 export async function processTranscription(transcription: string) {
-    const prompt = `
+  const prompt = `
         Com base no texto fornecido, gere um JSON com resumo e título:
 
         TEXTO:
@@ -75,31 +72,31 @@ export async function processTranscription(transcription: string) {
         }
     `.trim()
 
-    const response = await gemini.models.generateContent({
-        model,
-        contents: [
-            {
-                text: prompt
-            }
-        ]
-    })
+  const response = await gemini.models.generateContent({
+    model,
+    contents: [
+      {
+        text: prompt,
+      },
+    ],
+  })
 
-    if (!response.text) {
-        throw new Error('Failed to process transcription')
+  if (!response.text) {
+    throw new Error('Failed to process transcription')
+  }
+
+  try {
+    const cleanText = response.text
+      .replace(/```json\n?/g, '')
+      .replace(/```\n?/g, '')
+      .trim()
+
+    const result = JSON.parse(cleanText)
+    return {
+      summary: result.summary,
+      title: result.title,
     }
-
-    try {
-        const cleanText = response.text
-            .replace(/```json\n?/g, '')
-            .replace(/```\n?/g, '')
-            .trim()
-
-        const result = JSON.parse(cleanText)
-        return {
-            summary: result.summary,
-            title: result.title
-        }
-    } catch {
-        throw new Error(`Failed to parse Gemini response as JSON: ${response.text}`)
-    }
+  } catch {
+    throw new Error(`Failed to parse Gemini response as JSON: ${response.text}`)
+  }
 }
