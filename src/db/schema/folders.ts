@@ -1,9 +1,8 @@
 import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 
-export const user = pgTable('users', {
+export const folders = pgTable('folders', {
   id: uuid().primaryKey().defaultRandom(),
   name: text().notNull(),
-  email: text().notNull().unique(),
-  passwordHash: text().notNull(),
+  color: text(),
   createdAt: timestamp().defaultNow().notNull(),
 })

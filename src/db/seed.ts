@@ -1,5 +1,5 @@
 import { reset, seed } from 'drizzle-seed'
-import { db, sql } from '../config/database.ts'
+import { db, sql } from './connection.ts'
 import { schema } from './index.ts'
 
 await reset(db, schema)
@@ -11,9 +11,9 @@ await seed(db, schema).refine((f) => {
       columns: {
         name: f.fullName(),
         email: f.email(),
-        password_hash: f.string()
+        password: f.string(),
       },
-    }, 
+    },
   }
 })
 
