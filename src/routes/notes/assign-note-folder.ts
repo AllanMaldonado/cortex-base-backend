@@ -4,7 +4,7 @@ import { z } from 'zod'
 import { db } from '../../db/connection.ts'
 import { schema } from '../../db/index.ts'
 
-export const assignFolder: FastifyPluginCallbackZod = (app) => {
+export const assignNoteFolderRoute: FastifyPluginCallbackZod = (app) => {
   app.patch(
     '/notes/:noteId/assign-folder',
     {
