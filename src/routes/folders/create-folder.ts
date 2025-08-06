@@ -3,7 +3,7 @@ import z from 'zod'
 import { db } from '../../db/connection.ts'
 import { schema } from '../../db/index.ts'
 
-export const createFolder: FastifyPluginCallbackZod = (app) => {
+export const createFolderRoute: FastifyPluginCallbackZod = (app) => {
   app.post(
     '/folders',
     {
