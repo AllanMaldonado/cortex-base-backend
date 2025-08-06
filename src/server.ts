@@ -11,9 +11,14 @@ import { env } from './config/env.ts'
 import { loginRoute } from './routes/auth/login.ts'
 import { meRoute } from './routes/auth/me.ts'
 import { registerRoute } from './routes/auth/register.ts'
-import { createNoteRoute } from './routes/notes/create-note.ts'
+import { assignFolderColorRoute } from './routes/folders/assign-folder-color.ts'
 import { createFolderRoute } from './routes/folders/create-folder.ts'
+import { getFolderNotesRoute } from './routes/folders/get-folder-notes.ts'
+import { getFoldersRoute } from './routes/folders/get-folders.ts'
 import { assignNoteFolderRoute } from './routes/notes/assign-note-folder.ts'
+import { createNoteRoute } from './routes/notes/create-note.ts'
+import { getFolderRoute } from './routes/folders/get-folder.ts'
+import { getNoteRoute } from './routes/notes/get-note.ts'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 app.setSerializerCompiler(serializerCompiler)
@@ -41,12 +46,17 @@ app.register(fastifyJwt, {
 const prefix = '/api/v1'
 //rotas
 app.get('/health', () => 'OK')
-app.register(loginRoute, {prefix})
-app.register(registerRoute, {prefix})
-app.register(meRoute, {prefix})
-app.register(createNoteRoute, {prefix})
-app.register(createFolderRoute, {prefix})
-app.register(assignNoteFolderRoute, {prefix})
+app.register(loginRoute, { prefix })
+app.register(registerRoute, { prefix })
+app.register(meRoute, { prefix })
+app.register(createNoteRoute, { prefix })
+app.register(createFolderRoute, { prefix })
+app.register(assignNoteFolderRoute, { prefix })
+app.register(getFoldersRoute, { prefix })
+app.register(getFolderNotesRoute, { prefix })
+app.register(assignFolderColorRoute, { prefix })
+app.register(getFolderRoute, { prefix })
+app.register(getNoteRoute, { prefix })
 
 //run
 app.listen({ port: env.PORT })
