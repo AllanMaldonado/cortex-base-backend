@@ -24,6 +24,7 @@ export const loginRoute: FastifyPluginCallbackZod = (app) => {
       const [user] = await db
         .select({
           id: schema.users.id,
+          name: schema.users.name,
           email: schema.users.email,
           password: schema.users.password,
         })
@@ -46,7 +47,14 @@ export const loginRoute: FastifyPluginCallbackZod = (app) => {
         email: user.email,
       })
 
-      return res.status(200).send({ token })
+      return res.status(200).send({
+        token,
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        },
+      })
     }
   )
 }

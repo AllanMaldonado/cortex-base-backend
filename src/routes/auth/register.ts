@@ -48,7 +48,19 @@ export const registerRoute: FastifyPluginCallbackZod = (app) => {
         return res.status(500).send({ message: 'error creating user' })
       }
 
-      return res.status(201).send({ userId: insertedUser.id })
+      const token = app.jwt.sign({
+        id: insertedUser.id,
+        email: insertedUser.email,
+      })
+
+      return res.status(200).send({
+        token,
+        user: {
+          id: insertedUser.id,
+          name: insertedUser.name,
+          email: insertedUser.email,
+        },
+      })
     }
   )
 }
