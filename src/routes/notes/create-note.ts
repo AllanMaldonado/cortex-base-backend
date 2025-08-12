@@ -4,11 +4,13 @@ import { db } from '../../db/connection.ts'
 import { schema } from '../../db/index.ts'
 import { processTranscription, transcribeAudio } from '../../services/gemini.ts'
 import { processMediaFile } from '../../services/media.ts'
+import { authenticate } from '../../middleware/authenticate.ts'
 
 export const createNoteRoute: FastifyPluginCallbackZod = (app) => {
   app.post(
     '/notes',
     {
+      preHandler: authenticate,
       schema: {
         querystring: z.object({
           folderId: z.string().optional(),

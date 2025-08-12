@@ -13,11 +13,11 @@ import { meRoute } from './routes/auth/me.ts'
 import { registerRoute } from './routes/auth/register.ts'
 import { assignFolderColorRoute } from './routes/folders/assign-folder-color.ts'
 import { createFolderRoute } from './routes/folders/create-folder.ts'
+import { getFolderRoute } from './routes/folders/get-folder.ts'
 import { getFolderNotesRoute } from './routes/folders/get-folder-notes.ts'
 import { getFoldersRoute } from './routes/folders/get-folders.ts'
 import { assignNoteFolderRoute } from './routes/notes/assign-note-folder.ts'
 import { createNoteRoute } from './routes/notes/create-note.ts'
-import { getFolderRoute } from './routes/folders/get-folder.ts'
 import { getNoteRoute } from './routes/notes/get-note.ts'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()

@@ -3,11 +3,13 @@ import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { z } from 'zod'
 import { db } from '../../db/connection.ts'
 import { schema } from '../../db/index.ts'
+import { authenticate } from '../../middleware/authenticate.ts'
 
 export const assignFolderColorRoute: FastifyPluginCallbackZod = (app) => {
   app.patch(
     '/folders/:folderId/assign-color',
     {
+      preHandler: authenticate,
       schema: {
         params: z.object({
           folderId: z.string(),

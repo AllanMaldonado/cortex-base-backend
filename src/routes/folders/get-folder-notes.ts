@@ -3,11 +3,13 @@ import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import z from 'zod'
 import { db } from '../../db/connection.ts'
 import { schema } from '../../db/index.ts'
+import { authenticate } from '../../middleware/authenticate.ts'
 
 export const getFolderNotesRoute: FastifyPluginCallbackZod = (app) => {
   app.get(
     '/folders/:folderId/notes',
     {
+      preHandler: authenticate,
       schema: {
         params: z.object({
           folderId: z.string(),

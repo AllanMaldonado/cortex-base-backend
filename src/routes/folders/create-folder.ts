@@ -2,11 +2,13 @@ import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import z from 'zod'
 import { db } from '../../db/connection.ts'
 import { schema } from '../../db/index.ts'
+import { authenticate } from '../../middleware/authenticate.ts'
 
 export const createFolderRoute: FastifyPluginCallbackZod = (app) => {
   app.post(
     '/folders',
     {
+      preHandler: authenticate,
       schema: {
         body: z.object({
           name: z.string().min(1),
