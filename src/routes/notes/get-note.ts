@@ -1,4 +1,4 @@
-import { desc, eq } from 'drizzle-orm'
+import { and, desc, eq } from 'drizzle-orm'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import z from 'zod'
 import { db } from '../../db/connection.ts'
@@ -16,7 +16,8 @@ export const getNoteRoute: FastifyPluginCallbackZod = (app) => {
         }),
       },
     },
-    async (req) => {
+    async (req, res) => {
+      const { id: userId } = req.user
       const { noteId } = req.params
 
       const result = await db
@@ -28,10 +29,17 @@ export const getNoteRoute: FastifyPluginCallbackZod = (app) => {
           folderId: schema.notes.folderId,
         })
         .from(schema.notes)
-        .where(eq(schema.notes.id, noteId))
+        .where(and(
+          eq(schema.notes.id, noteId),
+          eq(schema.notes.userId, userId)
+        ))
         .orderBy(desc(schema.notes.createdAt))
 
-      return { result }
+      if (result.length === 0) {
+        return res.status(404).send({ message: 'Note not found' })
+      }
+
+      return result[0]
     }
   )
 }

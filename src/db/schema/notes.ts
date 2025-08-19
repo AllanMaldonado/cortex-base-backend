@@ -1,5 +1,6 @@
 import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { folders } from './folders.ts'
+import { users } from './users.ts'
 
 /** Futuramente:
  * - Criar tabela a parte (audioChunks), com noteId, transcription, summary, initialTime e endTime
@@ -13,6 +14,7 @@ export const notes = pgTable('notes', {
   title: text().notNull(),
   summary: text().notNull(),
   transcription: text().notNull(),
+  userId: uuid().references(() => users.id).notNull(),
   createdAt: timestamp().defaultNow().notNull(),
   folderId: uuid().references(() => folders.id),
 })

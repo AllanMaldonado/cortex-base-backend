@@ -17,13 +17,15 @@ export const createFolderRoute: FastifyPluginCallbackZod = (app) => {
       },
     },
     async (req, res) => {
+        const { id: userId } = req.user
         const {name, color} = req.body
 
-        const result = await db.
-        insert(schema.folders)
+        const result = await db
+        .insert(schema.folders)
         .values({
             name,
-            color
+            color,
+            userId
         })
         .returning()
 

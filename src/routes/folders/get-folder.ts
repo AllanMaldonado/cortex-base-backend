@@ -1,4 +1,4 @@
-import { desc, eq } from 'drizzle-orm'
+import { and, desc, eq } from 'drizzle-orm'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import z from 'zod'
 import { db } from '../../db/connection.ts'
@@ -16,7 +16,8 @@ export const getFolderRoute: FastifyPluginCallbackZod = (app) => {
         }),
       },
     },
-    async (req) => {
+    async (req, res) => {
+      const { id: userId } = req.user
       const { folderId } = req.params
 
       const result = await db
@@ -26,10 +27,17 @@ export const getFolderRoute: FastifyPluginCallbackZod = (app) => {
           color: schema.folders.color,
         })
         .from(schema.folders)
-        .where(eq(schema.folders.id, folderId))
+        .where(and(
+          eq(schema.folders.id, folderId),
+          eq(schema.folders.userId, userId)
+        ))
         .orderBy(desc(schema.folders.createdAt))
 
-      return { result }
+      if (result.length === 0) {
+        return res.status(404).send({ message: 'Folder not found' })
+      }
+
+      return result[0] 
     }
   )
 }

@@ -14,11 +14,11 @@ import { registerRoute } from './routes/auth/register.ts'
 import { assignFolderColorRoute } from './routes/folders/assign-folder-color.ts'
 import { createFolderRoute } from './routes/folders/create-folder.ts'
 import { getFolderRoute } from './routes/folders/get-folder.ts'
-import { getFolderNotesRoute } from './routes/folders/get-folder-notes.ts'
-import { getFoldersRoute } from './routes/folders/get-folders.ts'
+import { getFoldersRoute } from './routes/folders/list-folders.ts'
 import { assignNoteFolderRoute } from './routes/notes/assign-note-folder.ts'
 import { createNoteRoute } from './routes/notes/create-note.ts'
 import { getNoteRoute } from './routes/notes/get-note.ts'
+import { listNotesRoute } from './routes/notes/list-notes.ts'
 
 const app = fastify().withTypeProvider<ZodTypeProvider>()
 app.setSerializerCompiler(serializerCompiler)
@@ -53,10 +53,10 @@ app.register(createNoteRoute, { prefix })
 app.register(createFolderRoute, { prefix })
 app.register(assignNoteFolderRoute, { prefix })
 app.register(getFoldersRoute, { prefix })
-app.register(getFolderNotesRoute, { prefix })
 app.register(assignFolderColorRoute, { prefix })
 app.register(getFolderRoute, { prefix })
 app.register(getNoteRoute, { prefix })
+app.register(listNotesRoute, { prefix })
 
 //run
 app.listen({ port: env.PORT })

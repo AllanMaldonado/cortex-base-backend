@@ -19,6 +19,7 @@ export const createNoteRoute: FastifyPluginCallbackZod = (app) => {
     },
     async (request, reply) => {
       const { folderId } = request.query
+      const { id: userId } = request.user
       const file = await request.file()
 
       if (!file) {
@@ -33,19 +34,16 @@ export const createNoteRoute: FastifyPluginCallbackZod = (app) => {
       )
 
       const transcription = await transcribeAudio(audioBuffer, mimeType)
-      // biome-ignore lint/suspicious/noConsole: <Verificar tempo de Transcricao>
-      console.log(
-        `✅ Transcrição concluída: ${transcription.length} caracteres`
-      )
 
       const { summary, title } = await processTranscription(transcription)
-
+      
       const result = await db
         .insert(schema.notes)
         .values({
           title,
           summary,
           transcription,
+          userId,
           folderId: folderId ?? null,
         })
         .returning()
