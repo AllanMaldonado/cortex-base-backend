@@ -12,3 +12,7 @@
 
 # editor
 **/.vscode/
+
+/build
+
+/coverage

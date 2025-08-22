@@ -8,7 +8,8 @@
     "dev": "node --env-file .env --experimental-strip-types --no-warnings --watch src/server.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
-    "db:seed": "node --env-file .env --experimental-strip-types --no-warnings src/db/seed.ts"
+    "db:seed": "node --env-file .env --experimental-strip-types --no-warnings src/db/seed.ts",
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -23,7 +24,8 @@
     "drizzle-seed": "^0.3.1",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3",
-    "ultracite": "5.1.2"
+    "ultracite": "5.1.2",
+    "vitest": "^3.2.4"
   },
   "dependencies": {
     "@fastify/cors": "^11.0.1",
@@ -32,6 +34,7 @@
     "@google/genai": "^1.12.0",
     "bcryptjs": "^3.0.2",
     "docker-compose": "^1.2.0",
+    "dotenv": "^17.2.1",
     "drizzle-kit": "^0.31.4",
     "drizzle-orm": "^0.44.4",
     "fastify": "^5.4.0",
