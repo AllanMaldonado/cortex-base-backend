@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
-import z from 'zod'
+import z from 'zod/v4'
 import { db } from '../../db/connection.ts'
 import { schema } from '../../db/index.ts'
 import { comparePassword } from '../../utils/hash.ts'
@@ -10,16 +10,34 @@ export const loginRoute: FastifyPluginCallbackZod = (app) => {
     '/auth/login',
     {
       schema: {
+        tags: ['auth'],
+        description: 'Sign in',
         body: z.object({
-          email: z.email('E-mail inválido'),
+          email: z.email('Invalid email'),
           password: z
             .string()
-            .min(6, 'A senha deve ter no mínimo 6 caracteres'),
+            .min(6, 'The password must be at least 6 characters long.'),
         }),
+        response: {
+          200: z.object({
+            message: z.string(),
+            token: z.string(),
+            user: z.object({
+              id: z.string(),
+              name: z.string(),
+              email: z.string(),
+            }),
+          }),
+          401: z.object({
+            message: z
+              .string()
+              .describe('Error message for invalid credentials'),
+          }),
+        },
       },
     },
-    async (req, res) => {
-      const { email, password } = req.body
+    async (request, reply) => {
+      const { email, password } = request.body
 
       const [user] = await db
         .select({
@@ -33,13 +51,13 @@ export const loginRoute: FastifyPluginCallbackZod = (app) => {
         .limit(1)
 
       if (!user) {
-        return res.status(401).send({ message: 'Invalid Credentials' })
+        return reply.status(401).send({ message: 'Invalid Credentials' })
       }
 
       const isPassword = await comparePassword(password, user.password)
 
       if (!isPassword) {
-        return res.status(401).send({ message: 'Invalid Credentials' })
+        return reply.status(401).send({ message: 'Invalid Credentials' })
       }
 
       const token = app.jwt.sign({
@@ -47,7 +65,8 @@ export const loginRoute: FastifyPluginCallbackZod = (app) => {
         email: user.email,
       })
 
-      return res.status(200).send({
+      return reply.status(200).send({
+        message: 'User logged in successfully',
         token,
         user: {
           id: user.id,

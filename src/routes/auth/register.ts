@@ -10,17 +10,42 @@ export const registerRoute: FastifyPluginCallbackZod = (app) => {
     '/auth/register',
     {
       schema: {
+        tags: ['auth'],
+        description: 'Sign up',
         body: z.object({
-          name: z.string(),
-          email: z.email('E-mail inválido'),
+          name: z
+            .string()
+            .min(1, 'The name must be at least 1 character long.'),
+          email: z.email('Invalid email'),
           password: z
             .string()
-            .min(6, 'A senha deve ter no mínimo 6 caracteres'),
+            .min(6, 'The password must be at least 6 characters long'),
         }),
+        response: {
+          200: z.object({
+            message: z.string(),
+            token: z.string(),
+            user: z.object({
+              id: z.string(),
+              name: z.string(),
+              email: z.string(),
+            }),
+          }),
+          409: z.object({
+            message: z
+              .string()
+              .describe('Error message for user data conflicts'),
+          }),
+          500: z.object({
+            message: z
+              .string()
+              .describe('Error message for failed to create user'),
+          }),
+        },
       },
     },
-    async (req, res) => {
-      const { name, email, password } = req.body
+    async (request, reply) => {
+      const { name, email, password } = request.body
 
       const [existingUser] = await db
         .select({ email: schema.users.email })
@@ -28,12 +53,12 @@ export const registerRoute: FastifyPluginCallbackZod = (app) => {
         .where(eq(schema.users.email, email))
 
       if (existingUser) {
-        return res.status(409).send({ message: 'User already exists' })
+        return reply.status(409).send({ message: 'User already exists' })
       }
 
       const hashedPassword = await hashPassword(password)
 
-      const result = await db
+      const [insertedUser] = await db
         .insert(schema.users)
         .values({
           name,
@@ -42,10 +67,8 @@ export const registerRoute: FastifyPluginCallbackZod = (app) => {
         })
         .returning()
 
-      const insertedUser = result[0]
-
       if (!insertedUser) {
-        return res.status(500).send({ message: 'error creating user' })
+        return reply.status(500).send({ message: 'error creating user' })
       }
 
       const token = app.jwt.sign({
@@ -53,7 +76,8 @@ export const registerRoute: FastifyPluginCallbackZod = (app) => {
         email: insertedUser.email,
       })
 
-      return res.status(200).send({
+      return reply.status(200).send({
+        message: 'User registered successfully',
         token,
         user: {
           id: insertedUser.id,
