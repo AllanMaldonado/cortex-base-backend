@@ -1,5 +1,3 @@
-// vite.config.ts
-
 import dotenv from 'dotenv'
 import { defineConfig } from 'vite'
 
