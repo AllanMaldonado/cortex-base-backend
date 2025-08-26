@@ -1,5 +1,3 @@
-#.gitignore |-----------------------------|
-
 # Node.js 
 **/node_modules/
 
@@ -10,5 +8,11 @@
 # Docker
 **/.docker/
 
+# Build
+dist/
+build/
+
 # editor
-**/.vscode/
+**/.vscode/ 
+
+/coverage

@@ -5,6 +5,7 @@ const envSchema = z.object({
   DATABASE_URL: z.string().url().startsWith('postgres://'),
   GEMINI_API_KEY: z.string(),
   SECRET_KEY: z.string(),
+  CORS_ORIGIN: z.string().optional(),
 })
 
 export const env = envSchema.parse(process.env)

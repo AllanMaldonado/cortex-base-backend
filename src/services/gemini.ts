@@ -7,6 +7,9 @@ const gemini = new GoogleGenAI({
 
 const model = 'gemini-2.5-flash'
 
+// Regex for parsing Gemini response format
+const TITLE_SUMMARY_REGEX = /Título:\s*(.+)\nResumo:\s*([\s\S]+)/i
+
 export async function transcribeAudio(audioBuffer: Buffer, mimeType: string) {
   const prompt =
     'Transcreva o áudio para português do Brasil. Seja preciso e natural na transcrição. Mantenha a pontuação adequada e divida o texto em parágrafos quando for apropriado.'.trim()
@@ -46,31 +49,10 @@ export async function transcribeAudio(audioBuffer: Buffer, mimeType: string) {
   return response.text
 }
 
-export async function processTranscription(transcription: string) {
+export async function summarizeTranscription(transcription: string) {
   const prompt = `
-        Com base no texto fornecido, gere um JSON com resumo e título:
-
-        TEXTO:
-        ${transcription}
-
-        INSTRUÇÕES PARA O RESUMO:
-        - Preserve todos os pontos principais, dados relevantes e conclusões importantes
-        - Elimine apenas redundâncias, repetições desnecessárias e trechos que não agregam valor ao entendimento
-        - Mantenha a estrutura lógica e sequência de ideias do texto original
-        - Use exclusivamente as informações contidas no texto fornecido
-        - O resumo deve permitir compreensão completa do assunto sem necessidade de consultar o texto original
-        - Conserve termos técnicos, números específicos e citações quando relevantes para o contexto
-
-        INSTRUÇÕES PARA O TÍTULO:
-        - Defina o título que mais combina com o conteúdo
-        - Seja conciso e descritivo
-
-        Retorne APENAS o JSON no formato:
-        {
-            "summary": "resumo detalhado aqui",
-            "title": "título aqui"
-        }
-    `.trim()
+        Com base no texto fornecido, gere um resumo e um título, respondendo apenas em texto puro, sem formatação, sem blocos de código, sem JSON, apenas assim:
+        \nTítulo: <título aqui>\nResumo: <resumo detalhado aqui>\n\nTEXTO:\n${transcription}`.trim()
 
   const response = await gemini.models.generateContent({
     model,
@@ -85,18 +67,14 @@ export async function processTranscription(transcription: string) {
     throw new Error('Failed to process transcription')
   }
 
-  try {
-    const cleanText = response.text
-      .replace(/```json\n?/g, '')
-      .replace(/```\n?/g, '')
-      .trim()
-
-    const result = JSON.parse(cleanText)
-    return {
-      summary: result.summary,
-      title: result.title,
-    }
-  } catch {
-    throw new Error(`Failed to parse Gemini response as JSON: ${response.text}`)
+  const match = response.text.match(TITLE_SUMMARY_REGEX)
+  if (!match) {
+    throw new Error(
+      `Resposta inesperada do Gemini. Esperado formato:\nTítulo: ...\nResumo: ...\nRecebido:\n${response.text}`
+    )
   }
+  const title = match[1].trim()
+  const summary = match[2].trim()
+
+  return { summary, title }
 }
