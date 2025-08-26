@@ -43,14 +43,7 @@ export function convertVideoToMp3(videoBuffer: Buffer): Promise<Buffer> {
       .audioCodec('libmp3lame')
       .audioBitrate('32k')
       .audioChannels(1)
-      .outputOptions([
-        '-ar',
-        '16000',
-        '-q:a',
-        '9',
-        '-ac',
-        '1',
-      ])
+      .outputOptions(['-ar', '16000', '-q:a', '9', '-ac', '1'])
       .on('end', () => outputStream.end())
       .on('error', (error) => {
         reject(new Error(`Erro na conversão: ${error.message}`))
@@ -72,9 +65,6 @@ export async function processMediaFile(
     const startTime = Date.now()
     const audioBuffer = await convertVideoToMp3(buffer)
     const duration = Date.now() - startTime
-
-    // biome-ignore lint/suspicious/noConsole: <Verificar tempo de conversao>
-    console.log(`✅ Conversão concluída em ${duration}ms`)
 
     return {
       audioBuffer,

@@ -4,8 +4,7 @@ import { env } from './config/env.ts'
 const start = () => {
   try {
     app.listen({ port: env.PORT || 3333 }, () => {
-      // biome-ignore lint/suspicious/noConsole: <running log>
-      console.log(`Server running on port: ${env.PORT || 3333}`)
+      app.log.info(`Server listening at http://[::1]:${env.PORT}`)
     })
   } catch (err) {
     app.log.error(err)

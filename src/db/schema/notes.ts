@@ -14,7 +14,9 @@ export const notes = pgTable('notes', {
   title: text().notNull(),
   summary: text().notNull(),
   transcription: text().notNull(),
-  userId: uuid().references(() => users.id).notNull(),
+  userId: uuid()
+    .references(() => users.id)
+    .notNull(),
   createdAt: timestamp().defaultNow().notNull(),
   folderId: uuid().references(() => folders.id),
 })

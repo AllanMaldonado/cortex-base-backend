@@ -5,6 +5,8 @@ export const folders = pgTable('folders', {
   id: uuid().primaryKey().defaultRandom(),
   name: text().notNull(),
   color: text(),
-  userId: uuid().references(() => users.id).notNull(),
+  userId: uuid()
+    .references(() => users.id)
+    .notNull(),
   createdAt: timestamp().defaultNow().notNull(),
 })
