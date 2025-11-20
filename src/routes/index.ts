@@ -4,8 +4,11 @@ import { meRoute } from './auth/me.ts'
 import { registerRoute } from './auth/register.ts'
 import { assignFolderColorRoute } from './folders/assign-folder-color.ts'
 import { createFolderRoute } from './folders/create-folder.ts'
+import { deleteFolderRoute } from './folders/delete-folder.ts'
 import { getFolderRoute } from './folders/get-folder.ts'
+import { listFolderNotesRoute } from './folders/list-folder-notes.ts'
 import { listFoldersRoute } from './folders/list-folders.ts'
+import { updateFolderRoute } from './folders/update-folder.ts'
 import { healthRoute } from './health.ts'
 
 import { assignNoteFolderRoute } from './notes/assign-note-folder.ts'
@@ -46,4 +49,7 @@ export function registerRoutes(
   app.register(listFoldersRoute, { prefix })
   app.register(assignFolderColorRoute, { prefix })
   app.register(getFolderRoute, { prefix })
+  app.register(updateFolderRoute, { prefix })
+  app.register(deleteFolderRoute, { prefix })
+  app.register(listFolderNotesRoute, { prefix })
 }
