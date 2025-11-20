@@ -99,4 +99,63 @@ describe('Notes Routes', () => {
     const [deletedNote] = await db.select().from(schema.notes).where(eq(schema.notes.id, noteId))
     expect(deletedNote).toBeUndefined()
   })
+
+  it('should not create note without authentication', async () => {
+    const response = await app.inject({
+      method: 'POST',
+      url: '/api/v1/notes',
+      payload: {
+        file: 'dummy', // This would fail validation anyway, but auth check comes first
+      },
+    })
+    expect(response.statusCode).toBe(401)
+  })
+
+  it('should not access another user\'s note', async () => {
+    // Create another user
+    const otherUserEmail = `other-${Date.now()}@example.com`
+    const otherUserResponse = await app.inject({
+      method: 'POST',
+      url: '/api/v1/auth/register',
+      payload: {
+        name: 'Other User',
+        email: otherUserEmail,
+        password: 'password123',
+      },
+    })
+    const otherToken = JSON.parse(otherUserResponse.body).token
+
+    // Create a note for the first user
+    const [note] = await db.insert(schema.notes).values({
+      title: 'User 1 Note',
+      summary: 'Summary',
+      transcription: 'Transcription',
+      userId: userId,
+    }).returning()
+
+    // Try to get it as other user
+    const getResponse = await app.inject({
+      method: 'GET',
+      url: `/api/v1/notes/${note.id}`,
+      headers: { Authorization: `Bearer ${otherToken}` },
+    })
+    expect(getResponse.statusCode).toBe(404) // Or 403 depending on implementation, usually 404 to hide existence
+
+    // Try to update it as other user
+    const updateResponse = await app.inject({
+      method: 'PUT',
+      url: `/api/v1/notes/${note.id}`,
+      headers: { Authorization: `Bearer ${otherToken}` },
+      payload: { title: 'Hacked' },
+    })
+    expect(updateResponse.statusCode).toBe(404)
+
+    // Try to delete it as other user
+    const deleteResponse = await app.inject({
+      method: 'DELETE',
+      url: `/api/v1/notes/${note.id}`,
+      headers: { Authorization: `Bearer ${otherToken}` },
+    })
+    expect(deleteResponse.statusCode).toBe(404)
+  })
 })

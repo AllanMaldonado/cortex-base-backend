@@ -97,4 +97,42 @@ describe('Folders Routes', () => {
     const [note] = await db.select().from(schema.notes).where(eq(schema.notes.title, 'Note in Folder'))
     expect(note.folderId).toBeNull()
   })
+
+  it('should not access another user\'s folder', async () => {
+    // Create another user
+    const otherUserEmail = `other-folder-${Date.now()}@example.com`
+    const otherUserResponse = await app.inject({
+      method: 'POST',
+      url: '/api/v1/auth/register',
+      payload: {
+        name: 'Other User Folder',
+        email: otherUserEmail,
+        password: 'password123',
+      },
+    })
+    const otherToken = JSON.parse(otherUserResponse.body).token
+
+    // Create a folder for the first user
+    const [folder] = await db.insert(schema.folders).values({
+      name: 'User 1 Folder',
+      userId: userId,
+    }).returning()
+
+    // Try to update it as other user
+    const updateResponse = await app.inject({
+      method: 'PUT',
+      url: `/api/v1/folders/${folder.id}`,
+      headers: { Authorization: `Bearer ${otherToken}` },
+      payload: { name: 'Hacked Folder' },
+    })
+    expect(updateResponse.statusCode).toBe(404)
+
+    // Try to delete it as other user
+    const deleteResponse = await app.inject({
+      method: 'DELETE',
+      url: `/api/v1/folders/${folder.id}`,
+      headers: { Authorization: `Bearer ${otherToken}` },
+    })
+    expect(deleteResponse.statusCode).toBe(404)
+  })
 })
