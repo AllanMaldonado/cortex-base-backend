@@ -5,7 +5,7 @@ describe('Auth Routes', () => {
   it('should register a new user', async () => {
     const user = {
       name: 'teste',
-      email: 'teste3@gmail.com',
+      email: `teste-${Date.now()}@gmail.com`,
       password: '123456',
     }
 

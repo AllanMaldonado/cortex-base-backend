@@ -12,6 +12,9 @@ import { assignNoteFolderRoute } from './notes/assign-note-folder.ts'
 import { createNoteRoute } from './notes/create-note.ts'
 import { getNoteRoute } from './notes/get-note.ts'
 import { listNotesRoute } from './notes/list-notes.ts'
+import { changePasswordRoute } from './users/change-password.ts'
+import { deleteAccountRoute } from './users/delete-account.ts'
+import { updateProfileRoute } from './users/update-profile.ts'
 
 export function registerRoutes(
   app: FastifyTypedInstance,
@@ -24,6 +27,9 @@ export function registerRoutes(
   app.register(loginRoute, { prefix })
   app.register(registerRoute, { prefix })
   app.register(meRoute, { prefix })
+  app.register(updateProfileRoute, { prefix })
+  app.register(changePasswordRoute, { prefix })
+  app.register(deleteAccountRoute, { prefix })
 
   app.register(createNoteRoute, { prefix })
   app.register(assignNoteFolderRoute, { prefix })
