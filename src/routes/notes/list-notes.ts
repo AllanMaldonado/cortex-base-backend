@@ -1,4 +1,4 @@
-import { and, desc, eq, isNull } from 'drizzle-orm'
+import { and, asc, desc, eq, isNull } from 'drizzle-orm'
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import z from 'zod/v4'
 import { db } from '../../db/connection.ts'
@@ -18,6 +18,10 @@ export const listNotesRoute: FastifyPluginCallbackZod = (app) => {
             .string()
             .pipe(z.uuid('Invalid folder ID format'))
             .optional(),
+          page: z.coerce.number().min(1).default(1),
+          limit: z.coerce.number().min(1).max(100).default(20),
+          sortBy: z.enum(['createdAt', 'title']).default('createdAt'),
+          order: z.enum(['asc', 'desc']).default('desc'),
         }),
         response: {
           200: z.object({
@@ -37,7 +41,8 @@ export const listNotesRoute: FastifyPluginCallbackZod = (app) => {
     },
     async (request, reply) => {
       const { id: userId } = request.user
-      const { folderId } = request.query
+      const { folderId, page, limit, sortBy, order } = request.query
+      const offset = (page - 1) * limit
 
       const conditions = [eq(schema.notes.userId, userId)]
 
@@ -50,6 +55,10 @@ export const listNotesRoute: FastifyPluginCallbackZod = (app) => {
       const whereExpression =
         conditions.length > 1 ? and(...conditions) : conditions[0]
 
+      const sortColumn =
+        sortBy === 'title' ? schema.notes.title : schema.notes.createdAt
+      const sortOrder = order === 'asc' ? asc(sortColumn) : desc(sortColumn)
+
       const notes = await db
         .select({
           id: schema.notes.id,
@@ -60,7 +69,9 @@ export const listNotesRoute: FastifyPluginCallbackZod = (app) => {
         })
         .from(schema.notes)
         .where(whereExpression)
-        .orderBy(desc(schema.notes.createdAt))
+        .orderBy(sortOrder)
+        .limit(limit)
+        .offset(offset)
 
       return reply.status(200).send({
         message: 'Notes retrieved successfully',

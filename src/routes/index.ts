@@ -10,8 +10,11 @@ import { healthRoute } from './health.ts'
 
 import { assignNoteFolderRoute } from './notes/assign-note-folder.ts'
 import { createNoteRoute } from './notes/create-note.ts'
+import { deleteNoteRoute } from './notes/delete-note.ts'
 import { getNoteRoute } from './notes/get-note.ts'
 import { listNotesRoute } from './notes/list-notes.ts'
+import { searchNotesRoute } from './notes/search-notes.ts'
+import { updateNoteRoute } from './notes/update-note.ts'
 import { changePasswordRoute } from './users/change-password.ts'
 import { deleteAccountRoute } from './users/delete-account.ts'
 import { updateProfileRoute } from './users/update-profile.ts'
@@ -35,6 +38,9 @@ export function registerRoutes(
   app.register(assignNoteFolderRoute, { prefix })
   app.register(getNoteRoute, { prefix })
   app.register(listNotesRoute, { prefix })
+  app.register(updateNoteRoute, { prefix })
+  app.register(deleteNoteRoute, { prefix })
+  app.register(searchNotesRoute, { prefix })
 
   app.register(createFolderRoute, { prefix })
   app.register(listFoldersRoute, { prefix })
