@@ -80,6 +80,8 @@ describe('Folders Routes', () => {
     const body = JSON.parse(response.body)
     expect(body.notes).toHaveLength(1)
     expect(body.notes[0].title).toBe('Note in Folder')
+    expect(body.pagination).toBeDefined()
+    expect(body.pagination.total).toBe(1)
   })
 
   it('should delete a folder', async () => {

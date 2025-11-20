@@ -86,6 +86,10 @@ describe('Notes Routes', () => {
     const body = JSON.parse(response.body)
     expect(body.notes).toHaveLength(2)
     expect(body.notes[0].title).toBe('A Second Note') 
+    expect(body.pagination).toBeDefined()
+    expect(body.pagination.page).toBe(1)
+    expect(body.pagination.limit).toBe(10)
+    expect(body.pagination.total).toBe(2)
   })
 
   it('should delete a note', async () => {

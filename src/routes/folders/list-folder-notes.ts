@@ -1,6 +1,6 @@
 import type { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import z from 'zod/v4'
-import { eq, and, desc, asc, ilike, or } from 'drizzle-orm'
+import { eq, and, desc, asc, ilike, or, count } from 'drizzle-orm'
 import { db } from '../../db/connection.ts'
 import { schema } from '../../db/index.ts'
 import { authenticate } from '../../middleware/authenticate.ts'
@@ -35,6 +35,11 @@ export const listFolderNotesRoute: FastifyPluginCallbackZod = (app) => {
                 folderId: z.string().nullable(),
               })
             ),
+            pagination: z.object({
+              page: z.number(),
+              limit: z.number(),
+              total: z.number(),
+            }),
           }),
           404: z.object({
             message: z.string(),
@@ -77,6 +82,13 @@ export const listFolderNotesRoute: FastifyPluginCallbackZod = (app) => {
         sortBy === 'title' ? schema.notes.title : schema.notes.createdAt
       const sortOrder = order === 'asc' ? asc(sortColumn) : desc(sortColumn)
 
+      // Get total count
+      const [{ total }] = await db
+        .select({ total: count() })
+        .from(schema.notes)
+        .where(whereExpression)
+
+      // Get paginated notes
       const notes = await db
         .select({
           id: schema.notes.id,
@@ -97,6 +109,11 @@ export const listFolderNotesRoute: FastifyPluginCallbackZod = (app) => {
           ...note,
           createdAt: note.createdAt.toISOString(),
         })),
+        pagination: {
+          page,
+          limit,
+          total,
+        },
       })
     }
   )
