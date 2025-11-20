@@ -1,22 +1,25 @@
-import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import { index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { folders } from './folders.ts'
 import { users } from './users.ts'
 
-/** Futuramente:
- * - Criar tabela a parte (audioChunks), com noteId, transcription, summary, initialTime e endTime
- * - O audio vai ser dividio em chuncks por parte do video e seu topico resumido (0:00 ate 3:02 tem a intro por exemplo)
- * - em notes vai ter apenas o atributo summary que vai juntar tudo de todos os topicos de forma
- *
- */
-
-export const notes = pgTable('notes', {
-  id: uuid().primaryKey().defaultRandom(),
-  title: text().notNull(),
-  summary: text().notNull(),
-  transcription: text().notNull(),
-  userId: uuid()
-    .references(() => users.id)
-    .notNull(),
-  createdAt: timestamp().defaultNow().notNull(),
-  folderId: uuid().references(() => folders.id),
-})
+export const notes = pgTable(
+  'notes',
+  {
+    id: uuid().primaryKey().defaultRandom(),
+    title: text().notNull(),
+    summary: text().notNull(),
+    transcription: text().notNull(),
+    userId: uuid()
+      .references(() => users.id, { onDelete: 'cascade' })
+      .notNull(),
+    createdAt: timestamp().defaultNow().notNull(),
+    folderId: uuid().references(() => folders.id, { onDelete: 'set null' }),
+  },
+  (table) => {
+    return {
+      userIdIdx: index('notes_user_id_idx').on(table.userId),
+      folderIdIdx: index('notes_folder_id_idx').on(table.folderId),
+      createdAtIdx: index('notes_created_at_idx').on(table.createdAt),
+    }
+  }
+)
