@@ -4,6 +4,8 @@
 # Ambientes
 **/.env
 **/.env.*
+!**/.env.example 
+
 
 # Docker
 **/.docker/
@@ -16,3 +18,4 @@ build/
 **/.vscode/ 
 
 /coverage
+

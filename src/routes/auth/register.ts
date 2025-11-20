@@ -63,7 +63,7 @@ export const registerRoute: FastifyPluginCallbackZod = (app) => {
         .values({
           name,
           email,
-          password: hashedPassword,
+          passwordHash: hashedPassword,
         })
         .returning()
 

@@ -19,15 +19,14 @@ export const createNoteRoute: FastifyPluginCallbackZod = (app) => {
       schema: {
         tags: ['notes'],
         description: 'Create note',
+        consumes: ['multipart/form-data'],
         querystring: z.object({
           folderId: z
             .string()
             .pipe(z.uuid('Invalid folder ID format'))
             .optional(),
         }),
-        body: z.object({
-          file: z.instanceof(File),
-        }),
+
         response: {
           201: z.object({
             noteId: z.string(),

@@ -4,14 +4,23 @@ import { meRoute } from './auth/me.ts'
 import { registerRoute } from './auth/register.ts'
 import { assignFolderColorRoute } from './folders/assign-folder-color.ts'
 import { createFolderRoute } from './folders/create-folder.ts'
+import { deleteFolderRoute } from './folders/delete-folder.ts'
 import { getFolderRoute } from './folders/get-folder.ts'
+import { listFolderNotesRoute } from './folders/list-folder-notes.ts'
 import { listFoldersRoute } from './folders/list-folders.ts'
+import { updateFolderRoute } from './folders/update-folder.ts'
 import { healthRoute } from './health.ts'
 
 import { assignNoteFolderRoute } from './notes/assign-note-folder.ts'
 import { createNoteRoute } from './notes/create-note.ts'
+import { deleteNoteRoute } from './notes/delete-note.ts'
 import { getNoteRoute } from './notes/get-note.ts'
 import { listNotesRoute } from './notes/list-notes.ts'
+import { searchNotesRoute } from './notes/search-notes.ts'
+import { updateNoteRoute } from './notes/update-note.ts'
+import { changePasswordRoute } from './users/change-password.ts'
+import { deleteAccountRoute } from './users/delete-account.ts'
+import { updateProfileRoute } from './users/update-profile.ts'
 
 export function registerRoutes(
   app: FastifyTypedInstance,
@@ -24,14 +33,23 @@ export function registerRoutes(
   app.register(loginRoute, { prefix })
   app.register(registerRoute, { prefix })
   app.register(meRoute, { prefix })
+  app.register(updateProfileRoute, { prefix })
+  app.register(changePasswordRoute, { prefix })
+  app.register(deleteAccountRoute, { prefix })
 
   app.register(createNoteRoute, { prefix })
   app.register(assignNoteFolderRoute, { prefix })
   app.register(getNoteRoute, { prefix })
   app.register(listNotesRoute, { prefix })
+  app.register(updateNoteRoute, { prefix })
+  app.register(deleteNoteRoute, { prefix })
+  app.register(searchNotesRoute, { prefix })
 
   app.register(createFolderRoute, { prefix })
   app.register(listFoldersRoute, { prefix })
   app.register(assignFolderColorRoute, { prefix })
   app.register(getFolderRoute, { prefix })
+  app.register(updateFolderRoute, { prefix })
+  app.register(deleteFolderRoute, { prefix })
+  app.register(listFolderNotesRoute, { prefix })
 }

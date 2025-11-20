@@ -44,7 +44,7 @@ export const loginRoute: FastifyPluginCallbackZod = (app) => {
           id: schema.users.id,
           name: schema.users.name,
           email: schema.users.email,
-          password: schema.users.password,
+          passwordHash: schema.users.passwordHash,
         })
         .from(schema.users)
         .where(eq(schema.users.email, email))
@@ -54,7 +54,7 @@ export const loginRoute: FastifyPluginCallbackZod = (app) => {
         return reply.status(401).send({ message: 'Invalid Credentials' })
       }
 
-      const isPassword = await comparePassword(password, user.password)
+      const isPassword = await comparePassword(password, user.passwordHash)
 
       if (!isPassword) {
         return reply.status(401).send({ message: 'Invalid Credentials' })
